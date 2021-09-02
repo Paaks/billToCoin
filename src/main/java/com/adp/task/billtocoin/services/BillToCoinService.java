@@ -45,14 +45,20 @@ public class BillToCoinService {
            if(result.isEmpty())
                throw new NotEnoughCoinException(coinErrorMsg);
            else{
-               //Update table with Data.
+               updateCoinsUsage(result);
            }
-          /* coins = Arrays.asList(new Coin(0.1,10),
-                   new Coin(0.25,10)).stream().collect(Collectors.toList());*/
-
        }
        return result;
     }
+
+    private void updateCoinsUsage(Map<Double, Integer> result) {
+        for (Map.Entry<Double,Integer> entry:result.entrySet()) {
+            Coin c = coinRepository.findByDenomination(entry.getKey());
+            c.setCount(c.getCount() - entry.getValue());
+            coinRepository.save(c);
+        }
+    }
+
     private void coinCount(String billValue){
 
        List<Coin> coins = coinRepository.findAll();
